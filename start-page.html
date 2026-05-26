@@ -2076,6 +2076,14 @@
               <button class="btn btn-ghost btn-sm" data-action="import-data">Import</button>
             </div>
 
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Reset to defaults</span>
+                <span class="setting-hint">Clear all saved data and restore default collections and bookmarks</span>
+              </div>
+              <button class="btn btn-danger-outline btn-sm" data-action="confirm-reset-data">Reset</button>
+            </div>
+
             <div class="setting-row" style="flex-direction: column; align-items: stretch;">
               <span class="setting-hint" style="margin-bottom: 0.5rem;">Import format example:</span>
               <pre style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem; font-size: 0.72rem; line-height: 1.5; color: var(--text-muted); overflow-x: auto; white-space: pre; font-family: monospace;">{
@@ -2146,6 +2154,19 @@
         reader.readAsText(file);
       };
       input.click();
+    }
+
+    function resetData() {
+      Object.values(STORAGE).forEach(key => localStorage.removeItem(key));
+      state.groups = DEFAULT_GROUPS;
+      state.bookmarks = DEFAULT_BOOKMARKS;
+      state.settings = Object.assign({}, DEFAULT_SETTINGS);
+      state.collectionBookmarkView = 'icon-abbrev';
+      state.currentView = 'home';
+      state.selectedGroupId = null;
+      persistAll();
+      showToast('Reset to defaults', 'success');
+      render();
     }
 
     // ── Modals ──────────────────────────────────────────────────────────
@@ -2247,19 +2268,21 @@
 
     function renderDeleteConfirmModal() {
       const d = state.showDeleteConfirm;
+      const titles = { group: 'Delete Collection?', bookmark: 'Delete Bookmark?', reset: 'Reset All Data?' };
+      const messages = {
+        group: 'All bookmarks in this collection will also be deleted.',
+        bookmark: 'This bookmark will be permanently removed.',
+        reset: 'All collections, bookmarks, and settings will be replaced with defaults. This cannot be undone.',
+      };
       return `
         <div class="modal-overlay" role="dialog" aria-modal="true" tabindex="-1" data-action="close-modal" data-modal="delete">
           <div class="modal modal-sm" role="presentation" data-stop="1">
             <span class="confirm-icon">⚠</span>
-            <h2 class="modal-title">Delete ${d.type === 'group' ? 'Collection' : 'Bookmark'}?</h2>
-            <p class="confirm-text">
-              ${d.type === 'group'
-                ? 'All bookmarks in this collection will also be deleted.'
-                : 'This bookmark will be permanently removed.'}
-            </p>
+            <h2 class="modal-title">${titles[d.type] || 'Confirm'}</h2>
+            <p class="confirm-text">${messages[d.type] || ''}</p>
             <div class="modal-actions">
               <button class="btn btn-ghost" data-action="close-modal" data-modal="delete">Cancel</button>
-              <button class="btn btn-danger" data-action="do-delete">Delete</button>
+              <button class="btn btn-danger" data-action="do-delete">${d.type === 'reset' ? 'Reset' : 'Delete'}</button>
             </div>
           </div>
         </div>
@@ -2443,6 +2466,11 @@
     function doDelete() {
       const d = state.showDeleteConfirm;
       if (!d) return;
+      if (d.type === 'reset') {
+        state.showDeleteConfirm = null;
+        resetData();
+        return;
+      }
       if (d.type === 'group') {
         state.groups = state.groups.filter(g => g.id !== d.id);
         state.bookmarks = state.bookmarks.filter(b => b.groupId !== d.id);
@@ -2568,6 +2596,7 @@
         case 'set-setting-accent': updateSetting('accentColor', target.dataset.color); break;
         case 'export-data': exportData(); break;
         case 'import-data': importData(); break;
+        case 'confirm-reset-data': state.showDeleteConfirm = { type: 'reset' }; render(); break;
       }
     }
 
