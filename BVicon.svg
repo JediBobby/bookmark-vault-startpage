@@ -1,6 +1,6 @@
 <!--
-  Bookmark Vault emblem — design source. Not loaded at runtime.
-  start-page.html ships a single-line copy with bv_-prefixed defs ids
+  Bookmark Vault emblem — design source. Also linked from index.html for SVG-capable
+  favicons. index.html ships a single-line copy with bv_-prefixed defs ids
   (ICONS.bvicon). Update both when changing the artwork.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">

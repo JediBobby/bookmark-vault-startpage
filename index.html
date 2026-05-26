@@ -7,6 +7,8 @@
     1. DuckDuckGo favicon API (icons.duckduckgo.com/ip3/<domain>.ico) — per-bookmark,
        on-demand. Returns 404 on miss, so the image's onerror fires reliably and
        we swap to a deterministic colored-letter SVG avatar (built inline).
+    2. BVicon.svg (optional sibling file) — design source; runtime branding uses the
+       inlined copy in ICONS.bvicon (favicon SVG, web manifest, iOS/Android home-screen PNGs).
   Everything else (CSS, JS, icons, state) is inlined.
   Fonts fall back to system serifs (Iowan/Palatino/Baskerville etc → Georgia).
 
@@ -22,7 +24,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Bookmark Vault</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect x='44' y='44' width='424' height='424' rx='86' fill='%23111'/%3E%3Cpath d='M175 260L337 260L337 416L256 379L175 416Z' fill='%23c9a227'/%3E%3Ccircle cx='256' cy='234' r='116' fill='%231f1f1f' stroke='%23333' stroke-width='3'/%3E%3Ccircle cx='256' cy='234' r='76' fill='none' stroke='%23c9a227' stroke-width='8'/%3E%3Cline x1='256' y1='234' x2='256' y2='158' stroke='%23c9a227' stroke-width='10' stroke-linecap='round'/%3E%3Cline x1='256' y1='234' x2='325' y2='274' stroke='%23c9a227' stroke-width='10' stroke-linecap='round'/%3E%3Cline x1='256' y1='234' x2='187' y2='274' stroke='%23c9a227' stroke-width='10' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='234' r='20' fill='%23c9a227'/%3E%3Ccircle cx='256' cy='234' r='10' fill='%23111'/%3E%3C/svg%3E" />
+  <meta name="theme-color" content="#0d0d0f" />
+  <meta name="application-name" content="Bookmark Vault" />
+  <meta name="apple-mobile-web-app-title" content="Bookmark Vault" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <!-- Favicon + home-screen icons are installed from ICONS.bvicon (BVicon.svg) at init. -->
+  <link rel="icon" type="image/svg+xml" href="BVicon.svg" />
   <style>
     /* ─── Reset ─── */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1270,6 +1279,33 @@
         min-width: 1.875rem;
         padding: 0.2rem;
       }
+      /* Home view: view toggle + actions on their own row so Add is never covered */
+      .header--home .header-inner {
+        flex-wrap: wrap;
+        row-gap: 0.35rem;
+        align-items: center;
+      }
+      .header--home .nav {
+        flex: 1 1 100%;
+        width: 100%;
+        max-width: none;
+        overflow: visible;
+        justify-content: flex-end;
+        gap: 0.35rem;
+      }
+      .header--home .collection-view-toggle--nav {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .header--home .collection-view-toggle--nav::-webkit-scrollbar { display: none; }
+      .header--home .nav-actions {
+        flex: 0 0 auto;
+        flex-shrink: 0;
+      }
+      .header--home .nav-divider { display: none; }
       .main { padding: 1rem; }
       .section { margin-bottom: 1.25rem; }
       .favorites-row {
@@ -1310,15 +1346,6 @@
     @media (max-width: 480px) {
       .logo-text, .logo-measure { font-size: 0.88rem; letter-spacing: 0.08em; }
       .logo-bvicon-inline { width: 22px; height: 22px; }
-      .nav {
-        overflow-x: auto;
-        overflow-y: hidden;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-        max-width: min(58vw, 16rem);
-        padding-bottom: 1px;
-      }
-      .nav::-webkit-scrollbar { display: none; }
       .collection-view-toggle--nav button, .nav-action {
         min-height: 2rem;
         min-width: 2rem;
@@ -1355,6 +1382,95 @@
       // Custom "Bookmark Vault" emblem — gold wheel + vault door + ribbon. From BVicon.svg.
       bvicon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%" aria-hidden="true"><defs><radialGradient id="bv_bgGlow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#3a301a" stop-opacity="0.6"/><stop offset="100%" stop-color="#050505" stop-opacity="1"/></radialGradient><linearGradient id="bv_metalBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2d2d2d"/><stop offset="50%" stop-color="#202020"/><stop offset="100%" stop-color="#111111"/></linearGradient><linearGradient id="bv_goldLight" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#9a7a35"/><stop offset="25%" stop-color="#eac775"/><stop offset="50%" stop-color="#be9648"/><stop offset="75%" stop-color="#fdf1a9"/><stop offset="100%" stop-color="#a1813bc0"/></linearGradient><linearGradient id="bv_goldDark" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5a451b"/><stop offset="50%" stop-color="#a8853b"/><stop offset="100%" stop-color="#4e3b16"/></linearGradient><radialGradient id="bv_goldRad" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fae19c"/><stop offset="40%" stop-color="#c99e49"/><stop offset="85%" stop-color="#8a6627"/><stop offset="100%" stop-color="#574117"/></radialGradient><radialGradient id="bv_vaultDoor" cx="45%" cy="45%" r="60%"><stop offset="0%" stop-color="#383838"/><stop offset="60%" stop-color="#1f1f1f"/><stop offset="100%" stop-color="#0d0d0d"/></radialGradient><linearGradient id="bv_vaultRing" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4f4f4f"/><stop offset="50%" stop-color="#262626"/><stop offset="100%" stop-color="#141414"/></linearGradient><linearGradient id="bv_hingeGrad" x1="0%" y1="50%" x2="100%" y2="50%"><stop offset="0%" stop-color="#151515"/><stop offset="30%" stop-color="#404040"/><stop offset="70%" stop-color="#262626"/><stop offset="100%" stop-color="#0f0f0f"/></linearGradient><filter id="bv_outerShadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#000000" flood-opacity="0.8"/></filter><filter id="bv_realShadow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur in="SourceAlpha" stdDeviation="8"/><feOffset dx="0" dy="6" result="offsetblur"/><feComponentTransfer><feFuncA type="linear" slope="0.6"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect x="30" y="30" width="452" height="452" rx="96" fill="url(#bv_bgGlow)"/><rect x="42" y="42" width="428" height="428" rx="88" fill="none" stroke="url(#bv_goldDark)" stroke-width="1.5" opacity="0.8"/><rect x="44" y="44" width="424" height="424" rx="86" fill="url(#bv_metalBg)" filter="url(#bv_outerShadow)"/><rect x="45" y="45" width="422" height="422" rx="85" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.08"/><g filter="url(#bv_realShadow)"><path d="M 172 260 L 340 260 L 340 422 L 256 384 L 172 422 Z" fill="url(#bv_goldDark)"/><path d="M 175 260 L 337 260 L 337 416 L 256 379 L 175 416 Z" fill="url(#bv_goldLight)" opacity="0.9"/></g><g transform="translate(0, -10)"><circle cx="256" cy="236" r="132" fill="none" stroke="#000000" stroke-width="15" opacity="0.5" filter="url(#bv_realShadow)"/><circle cx="256" cy="234" r="130" fill="url(#bv_vaultRing)" stroke="url(#bv_goldDark)" stroke-width="3"/><circle cx="256" cy="234" r="116" fill="url(#bv_vaultDoor)" stroke="#111111" stroke-width="2"/><g fill="url(#bv_goldRad)" stroke="#322207" stroke-width="0.75"><circle cx="256" cy="111" r="5"/><circle cx="343" cy="147" r="5"/><circle cx="379" cy="234" r="5"/><circle cx="343" cy="321" r="5"/><circle cx="256" cy="357" r="5"/><circle cx="169" cy="321" r="5"/><circle cx="133" cy="234" r="5"/><circle cx="169" cy="147" r="5"/></g><circle cx="256" cy="234" r="92" fill="none" stroke="url(#bv_goldDark)" stroke-width="2" opacity="0.5"/><g filter="url(#bv_realShadow)"><rect x="120" y="212" width="40" height="44" fill="url(#bv_vaultRing)" rx="2" stroke="#111" stroke-width="1"/><rect x="125" y="222" width="30" height="24" fill="url(#bv_goldDark)" rx="1"/><rect x="114" y="174" width="22" height="120" fill="url(#bv_hingeGrad)" rx="3" stroke="#111" stroke-width="1.5"/><rect x="114" y="170" width="22" height="7" fill="url(#bv_goldLight)" rx="1"/><rect x="114" y="291" width="22" height="7" fill="url(#bv_goldLight)" rx="1"/><rect x="112" y="210" width="26" height="6" fill="url(#bv_goldLight)" rx="1"/><rect x="112" y="252" width="26" height="6" fill="url(#bv_goldLight)" rx="1"/></g><g filter="url(#bv_realShadow)"><g stroke="url(#bv_goldLight)" stroke-width="12" stroke-linecap="round"><line x1="256" y1="234" x2="256" y2="154"/><line x1="256" y1="234" x2="325" y2="274"/><line x1="256" y1="234" x2="187" y2="274"/><line x1="256" y1="234" x2="256" y2="314"/><line x1="256" y1="234" x2="325" y2="194"/><line x1="256" y1="234" x2="187" y2="194"/></g><g stroke="url(#bv_goldDark)" stroke-width="4" stroke-linecap="round" opacity="0.7"><line x1="256" y1="234" x2="256" y2="158"/><line x1="256" y1="234" x2="321" y2="271"/><line x1="256" y1="234" x2="191" y2="271"/><line x1="256" y1="234" x2="256" y2="310"/><line x1="256" y1="234" x2="321" y2="197"/><line x1="256" y1="234" x2="191" y2="197"/></g><circle cx="256" cy="234" r="76" fill="none" stroke="url(#bv_goldDark)" stroke-width="10"/><circle cx="256" cy="234" r="76" fill="none" stroke="url(#bv_goldLight)" stroke-width="6"/><circle cx="256" cy="234" r="71" fill="none" stroke="#3d2c0a" stroke-width="1.5"/><circle cx="256" cy="234" r="30" fill="url(#bv_goldDark)" stroke="#2d2105" stroke-width="1"/><circle cx="256" cy="234" r="24" fill="url(#bv_goldRad)"/><circle cx="256" cy="234" r="20" fill="url(#bv_goldLight)"/><circle cx="256" cy="234" r="14" fill="url(#bv_goldDark)"/><circle cx="254" cy="232" r="8" fill="#fff" opacity="0.3"/></g></g></svg>`,
     };
+
+    // Same artwork as BVicon.svg — used for favicon, manifest, and iOS home-screen PNGs.
+    function bvIconSvgForBranding() {
+      return ICONS.bvicon
+        .replace(/\s(width|height)="100%"/g, '')
+        .replace(/\saria-hidden="true"/, '');
+    }
+
+    function svgToDataUrl(svg) {
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.trim());
+    }
+
+    function upsertHeadLink(rel, href, { sizes, type } = {}) {
+      const selector = sizes
+        ? `link[rel="${rel}"][sizes="${sizes}"]`
+        : `link[rel="${rel}"]`;
+      let link = [...document.head.querySelectorAll(selector)].find(
+        (el) => (sizes ? el.sizes?.value === sizes : !el.sizes?.value)
+      );
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = rel;
+        if (sizes) link.sizes = sizes;
+        document.head.appendChild(link);
+      }
+      link.href = href;
+      if (type) link.type = type;
+      return link;
+    }
+
+    function rasterizeSvgToPng(svg, size) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) { reject(new Error('Canvas unsupported')); return; }
+          ctx.drawImage(img, 0, 0, size, size);
+          resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = () => reject(new Error('SVG rasterize failed'));
+        img.src = svgToDataUrl(svg);
+      });
+    }
+
+    let brandingIconsInstalled = false;
+    async function installBrandingIcons() {
+      if (brandingIconsInstalled) return;
+      brandingIconsInstalled = true;
+
+      const svg = bvIconSvgForBranding();
+      const svgDataUrl = svgToDataUrl(svg);
+      upsertHeadLink('icon', svgDataUrl, { type: 'image/svg+xml' });
+
+      try {
+        const [touch180, icon192, icon512] = await Promise.all([
+          rasterizeSvgToPng(svg, 180),
+          rasterizeSvgToPng(svg, 192),
+          rasterizeSvgToPng(svg, 512),
+        ]);
+        upsertHeadLink('apple-touch-icon', touch180, { sizes: '180x180' });
+        const manifest = {
+          name: 'Bookmark Vault',
+          short_name: 'Vault',
+          description: 'Personal bookmark start page',
+          start_url: './',
+          scope: './',
+          display: 'standalone',
+          background_color: '#0d0d0f',
+          theme_color: '#0d0d0f',
+          icons: [
+            { src: svgDataUrl, sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+            { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+          ],
+        };
+        const prev = document.querySelector('link[rel="manifest"]');
+        if (prev?.href?.startsWith('blob:')) URL.revokeObjectURL(prev.href);
+        upsertHeadLink(
+          'manifest',
+          URL.createObjectURL(
+            new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' })
+          )
+        );
+      } catch {
+        upsertHeadLink('apple-touch-icon', svgDataUrl);
+      }
+    }
 
     // ────────────────────────────────────────────────────────────────────
     // Default seed data.
@@ -1733,7 +1849,7 @@
         </div>` : '';
 
       return `
-        <header class="header">
+        <header class="header${viewToggle ? ' header--home' : ''}">
           <div class="header-inner">
             <div class="header-brand">
               <div class="header-meta">
@@ -2804,6 +2920,7 @@
     // Init.
     // ────────────────────────────────────────────────────────────────────
     function init() {
+      installBrandingIcons();
       updateDateTime();
       render();
       // mount animation
