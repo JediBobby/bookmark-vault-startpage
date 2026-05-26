@@ -1572,6 +1572,7 @@
     const DEFAULT_SETTINGS = {
       confirmBeforeOpenAll: true,
       openInNewTabs: true,
+      staggeredTabOpening: false,
       maxTabsLimit: 10,
       accentColor: '#c9a227',
     };
@@ -2109,6 +2110,23 @@
                      data-action="set-setting"
                      data-setting="maxTabsLimit" />
             </label>
+
+            <label class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Staggered tab opening</span>
+                <span class="setting-hint">Open tabs one at a time with a short delay to avoid popup blockers</span>
+              </div>
+              <input type="checkbox" class="toggle"
+                     ${state.settings.staggeredTabOpening ? 'checked' : ''}
+                     data-action="set-setting"
+                     data-setting="staggeredTabOpening" />
+            </label>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-hint" style="color: var(--text-muted)">Note: Your browser may block "Open All" from opening multiple tabs. If tabs are not opening, allow popups for this page in your browser settings or enable staggered tab opening above.</span>
+              </div>
+            </div>
           </div>
 
           <div class="settings-card" style="--delay: 1">
@@ -2130,8 +2148,96 @@
               </div>
             </div>
           </div>
+
+          <div class="settings-card" style="--delay: 2">
+            <h2 class="settings-section-title">Data</h2>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Export bookmarks</span>
+                <span class="setting-hint">Download all collections, bookmarks, and settings as a JSON file</span>
+              </div>
+              <button class="btn btn-ghost btn-sm" data-action="export-data">Export</button>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Import bookmarks</span>
+                <span class="setting-hint">Load a previously exported JSON file (replaces current data)</span>
+              </div>
+              <button class="btn btn-ghost btn-sm" data-action="import-data">Import</button>
+            </div>
+
+            <div class="setting-row" style="flex-direction: column; align-items: stretch;">
+              <span class="setting-hint" style="margin-bottom: 0.5rem;">Import format example:</span>
+              <pre style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem; font-size: 0.72rem; line-height: 1.5; color: var(--text-muted); overflow-x: auto; white-space: pre; font-family: monospace;">{
+  "groups": [
+    { "id": "1", "name": "My Group", "description": "...",
+      "icon": "◆", "accentColor": "#c9a227", "displayAsList": false }
+  ],
+  "bookmarks": [
+    { "id": "b1", "title": "Example", "url": "https://example.com/",
+      "isFavorite": false, "groupId": "1" }
+  ]
+}</pre>
+            </div>
+          </div>
         </section>
       `;
+    }
+
+    // ── Data export / import ────────────────────────────────────────────
+    function exportData() {
+      const data = {
+        groups: state.groups,
+        bookmarks: state.bookmarks,
+        settings: state.settings,
+        collectionBookmarkView: state.collectionBookmarkView,
+        exportedAt: new Date().toISOString(),
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'bookmark-vault-export.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Data exported', 'success');
+    }
+
+    function importData() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = () => {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            if (!Array.isArray(data.groups) || !Array.isArray(data.bookmarks)) {
+              showToast('Invalid file: missing groups or bookmarks', 'error');
+              return;
+            }
+            state.groups = data.groups;
+            state.bookmarks = data.bookmarks;
+            if (data.settings && typeof data.settings === 'object') {
+              state.settings = Object.assign({}, DEFAULT_SETTINGS, data.settings);
+            }
+            if (data.collectionBookmarkView) {
+              state.collectionBookmarkView = data.collectionBookmarkView;
+            }
+            persistAll();
+            showToast('Data imported successfully', 'success');
+            render();
+          } catch (_) {
+            showToast('Failed to read file: invalid JSON', 'error');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
     }
 
     // ── Modals ──────────────────────────────────────────────────────────
@@ -2467,13 +2573,18 @@
     }
     function openAllBookmarks(groupId) {
       const groupBms = bookmarksInGroup(groupId);
-      const toOpen = groupBms.slice(0, state.settings.maxTabsLimit);
-      toOpen.forEach(b => {
-        if (!isAllowedUrl(b.url)) return;
-        if (state.settings.openInNewTabs) window.open(b.url, '_blank');
-        else window.location.href = b.url;
-      });
+      const toOpen = groupBms.slice(0, state.settings.maxTabsLimit).filter(b => isAllowedUrl(b.url));
       state.showOpenAllConfirm = null;
+      if (state.settings.staggeredTabOpening && state.settings.openInNewTabs) {
+        toOpen.forEach((b, i) => {
+          setTimeout(() => window.open(b.url, '_blank'), i * 400);
+        });
+      } else {
+        toOpen.forEach(b => {
+          if (state.settings.openInNewTabs) window.open(b.url, '_blank');
+          else window.location.href = b.url;
+        });
+      }
       showToast(`Opened ${toOpen.length} bookmark${toOpen.length !== 1 ? 's' : ''}`);
       render();
     }
@@ -2547,6 +2658,8 @@
         case 'do-delete': doDelete(); break;
         case 'do-open-all': openAllBookmarks(state.showOpenAllConfirm); break;
         case 'set-setting-accent': updateSetting('accentColor', target.dataset.color); break;
+        case 'export-data': exportData(); break;
+        case 'import-data': importData(); break;
       }
     }
 

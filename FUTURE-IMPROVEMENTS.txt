@@ -1,0 +1,41 @@
+Bookmark Vault — Future Improvements
+======================================
+
+1. Full DOM Rebuild on Every State Change
+-----------------------------------------
+Currently, every state change (toggling a favorite, opening a modal, switching
+views) rebuilds the entire page via innerHTML. This causes:
+  - All favicon images re-fetch from Google on every re-render
+  - Scroll position resets
+  - Keyboard focus is lost after actions
+  - CSS transitions can be interrupted mid-flight
+
+The app already has one targeted workaround: the inline group editor updates
+only the title/description text directly instead of re-rendering.
+
+Possible approaches:
+  a) Extend the targeted-update pattern to high-frequency actions (favorite
+     toggle, modal open/close) so only the affected DOM nodes change.
+  b) Adopt a lightweight virtual DOM or diff-based rendering library.
+  c) Full rewrite of the render layer using DOM APIs instead of innerHTML.
+
+Tradeoff: (a) is incremental and low-risk but becomes messy over time.
+(b) and (c) are cleaner but are large efforts for an app that currently
+works fast enough in practice.
+
+Priority: Low. Not noticeable to the user at current data sizes.
+
+
+2. Bookmark Search / Filter
+----------------------------
+With 121+ bookmarks across 10 groups, finding a specific bookmark requires
+visually scanning cards or opening each group detail view.
+
+Proposed feature:
+  - Search input in the header bar
+  - Filters bookmarks across all groups by case-insensitive title match
+  - Results shown as a flat list with group labels
+  - Could optionally search URLs too
+  - Keyboard shortcut (e.g., Ctrl+K or /) to focus the search input
+
+Priority: Medium. Becomes more valuable as the bookmark count grows.
