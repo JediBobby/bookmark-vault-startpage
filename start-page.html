@@ -1370,57 +1370,9 @@
       { id: '8', name: 'EDU',               description: 'Medical education podcasts & resources',  icon: '✧', accentColor: '#a28b7b' },
     ];
 
-    const DEFAULT_BOOKMARKS = [
-      // Email
-      { id: 'b1', title: 'Gmail',            url: 'https://mail.google.com/mail/u/0/#inbox',  isFavorite: false, groupId: '1' },
-      { id: 'b2', title: 'Outlook',          url: 'https://outlook.live.com/',                 isFavorite: false, groupId: '1' },
-      { id: 'b3', title: 'Airbnb',           url: 'https://www.airbnb.com/',                   isFavorite: false, groupId: '1' },
-
-      // Study
-      { id: 'b4', title: 'CHEST SEEK',       url: 'https://seek.chestnet.org/my-account/login',               isFavorite: true,  groupId: '2' },
-      { id: 'b5', title: 'Cleveland Clinic EDU', url: 'https://healthcareedu.ccf.org/login/index.php',        isFavorite: false, groupId: '2' },
-      { id: 'b6', title: 'ECG Waves',        url: 'https://ecgwaves.com/wp-login.php',                        isFavorite: false, groupId: '2' },
-      { id: 'b7', title: 'Acid Base Book',   url: 'https://www.anaesthesiamcq.com/AcidBaseBook/ABindex.php',   isFavorite: false, groupId: '2' },
-
-      // Recurring Payments
-      { id: 'b8',  title: 'PR Acueductos',   url: 'https://miacueductos.acueductospr.com/login', isFavorite: false, groupId: '3' },
-      { id: 'b9',  title: 'PR LUMA',         url: 'https://miluma.lumapr.com/login',              isFavorite: false, groupId: '3' },
-      { id: 'b10', title: 'Liberty PR',      url: 'https://my.libertypr.com/login',               isFavorite: false, groupId: '3' },
-
-      // LLM
-      { id: 'b11', title: 'Open Evidence',   url: 'https://www.openevidence.com/',  isFavorite: false, groupId: '4' },
-      { id: 'b12', title: 'Claude',          url: 'https://claude.ai/new',          isFavorite: true,  groupId: '4' },
-      { id: 'b13', title: 'ChatGPT',         url: 'https://chatgpt.com/',           isFavorite: true,  groupId: '4' },
-      { id: 'b14', title: 'GitHub',          url: 'https://github.com/',            isFavorite: false, groupId: '4' },
-
-      // Reference
-      { id: 'b15', title: 'Learning Radiology',  url: 'https://learningradiology.com/toc/tocsubsection/toclectures.htm',                                          isFavorite: false, groupId: '5' },
-      { id: 'b16', title: 'Radiology Assistant',  url: 'https://radiologyassistant.nl/chest/chest-x-ray/basic-interpretation',                                     isFavorite: false, groupId: '5' },
-      { id: 'b17', title: 'ATS Reading List',     url: 'https://site.thoracic.org/learning/professional-development-for-early-and-mid-career-professionals/ats-adult-reading-list', isFavorite: false, groupId: '5' },
-
-      // Finance
-      { id: 'b18', title: 'Chase',            url: 'https://www.chase.com/',              isFavorite: false, groupId: '6' },
-      { id: 'b19', title: 'PenFed',           url: 'https://www.penfed.org/',             isFavorite: false, groupId: '6' },
-      { id: 'b20', title: 'Banco Popular',    url: 'https://www.bancopopular.com/',       isFavorite: false, groupId: '6' },
-      { id: 'b21', title: 'Ally',             url: 'https://www.ally.com/',               isFavorite: false, groupId: '6' },
-      { id: 'b22', title: 'Coinbase',         url: 'https://www.coinbase.com/',           isFavorite: false, groupId: '6' },
-      { id: 'b23', title: 'Nelnet',           url: 'https://www.nelnet.com/welcome',      isFavorite: false, groupId: '6' },
-      { id: 'b24', title: 'Student Aid PSLF', url: 'https://studentaid.gov/pslf/',        isFavorite: false, groupId: '6' },
-      { id: 'b25', title: 'Investor.gov',     url: 'https://www.investor.gov/',           isFavorite: false, groupId: '6' },
-      { id: 'b26', title: 'Money Guy Resources', url: 'https://moneyguy.com/resources/',  isFavorite: false, groupId: '6' },
-
-      // Health (empty group)
-
-      // EDU
-      { id: 'b27', title: 'Clinical Problem Solving',   url: 'https://clinicalproblemsolving.com/',            isFavorite: false, groupId: '8' },
-      { id: 'b28', title: 'Core IM',                    url: 'https://www.coreimpodcast.com/',                 isFavorite: false, groupId: '8' },
-      { id: 'b29', title: 'PulmPeeps',                  url: 'https://www.pulmpeeps.com/',                     isFavorite: false, groupId: '8' },
-      { id: 'b30', title: 'Louisville Lectures',        url: 'https://www.louisvillelectures.org/',            isFavorite: false, groupId: '8' },
-      { id: 'b31', title: 'ECG Interpretation Blog',    url: 'https://ecg-interpretation.blogspot.com/',       isFavorite: false, groupId: '8' },
-      { id: 'b32', title: 'ECG Simulator',              url: 'https://www.skillstat.com/tools/ecg-simulator/', isFavorite: false, groupId: '8' },
-      { id: 'b33', title: 'Time of Care',               url: 'https://www.timeofcare.com/',                    isFavorite: false, groupId: '8' },
-      { id: 'b34', title: 'Divine Intervention Podcasts', url: 'https://divineinterventionpodcasts.com/',      isFavorite: false, groupId: '8' },
-    ];
+    // Empty by default — collections are seeded but contain no bookmarks.
+    // Users add their own via the + Add Bookmark button inside each collection.
+    const DEFAULT_BOOKMARKS = [];
 
     const DEFAULT_SETTINGS = {
       confirmBeforeOpenAll: true,
