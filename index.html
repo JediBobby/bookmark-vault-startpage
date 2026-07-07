@@ -414,7 +414,6 @@
     .p-star { position: absolute; top: -5px; right: -5px; width: 15px; height: 15px; border-radius: 50%;
       background: var(--bg); color: var(--accent); font-size: 0.62rem; display: grid; place-items: center; z-index: 2; }
     .preview.v-list .p-star, .preview.v-chip .p-star { position: static; background: none; width: auto; height: auto; }
-    .p-more { font-size: 0.72rem; color: var(--text-dim); align-self: center; padding: 0 0.3rem; }
     .p-empty { font-size: 0.78rem; color: var(--text-dim); font-style: italic; padding: 0.2rem 0; }
 
     /* Edit-mode collection card */
@@ -1205,7 +1204,7 @@
     const favs = favorites();
     const favSection = favs.length === 0 ? '' : `
       <section class="section">
-        <div class="section-head"><span class="section-title">${I.starFill} Favorites</span></div>
+        <div class="section-head"><span class="section-title">${I.starFill}</span></div>
         <div class="rail">
           ${favs.map((b, i) => `
             <a class="fav" href="${esc(href(b.url))}" ${linkAttrs()} title="${esc(b.title)}" data-fav="${i}">
@@ -1228,7 +1227,7 @@
     return hero + favSection + `
       <section class="section">
         <div class="section-head">
-          <span class="section-title">${I.folder} Collections <span class="count">· ${state.collections.length}</span></span>
+          <span class="section-title"></span>
           <div style="display:inline-flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
             ${viewSeg}
             <button class="btn btn-ghost btn-sm" data-act="new-collection">${I.plus} New</button>
@@ -1247,16 +1246,13 @@
   function linkAttrs() { return state.settings.openInNewTabs ? 'target="_blank" rel="noopener"' : 'target="_self"'; }
 
   // ── Collection card ─────────────────────────────────────────────────────
-  const PREVIEW_CAP = { chip: 10, grid: 12, list: 8, large: 8 };
   function previewHTML(col) {
     const view = collectionView(col);
     const vm = viewMode(view);
     const named = view === 'large' && state.settings.largeIconNames;
     const bms = marksIn(col.id);
     if (bms.length === 0) return `<div class="preview ${vm.cls}"><span class="p-empty">No bookmarks yet</span></div>`;
-    const cap = PREVIEW_CAP[view] || 10;
-    const shown = bms.slice(0, cap);
-    const items = shown.map(bm => {
+    const items = bms.map(bm => {
       const showName = view === 'list' || view === 'chip' || named;
       return `<a class="p-item" href="${esc(href(bm.url))}" ${linkAttrs()} title="${esc(bm.title)}" data-stop>
         ${markIcon(bm, 'p-ico', 'p-emoji')}
@@ -1264,8 +1260,7 @@
         ${bm.isFavorite ? `<span class="p-star" aria-hidden="true">★</span>` : ''}
       </a>`;
     }).join('');
-    const more = bms.length > cap ? `<span class="p-more">+${bms.length - cap}</span>` : '';
-    return `<div class="preview ${vm.cls}${named ? ' named' : ''}">${items}${more}</div>`;
+    return `<div class="preview ${vm.cls}${named ? ' named' : ''}">${items}</div>`;
   }
 
   function collectionCardHTML(col, i) {
