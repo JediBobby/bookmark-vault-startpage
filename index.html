@@ -11,8 +11,7 @@
     • Drag-and-drop bookmarks (reorder + move between collections) and collections.
     • Quick-add: paste a URL, auto-title + live favicon preview, duplicate detection.
     • Per-collection view modes; per-bookmark custom icon/emoji, note, and tags.
-    • Widgets: live clock + greeting, calendar (week numbers, holidays, multi-month),
-      quick-notes / todo panel.
+    • Widgets: calendar (week numbers, holidays, multi-month), quick-notes / todo panel.
     • Netscape-HTML bookmark import (folders -> collections) + versioned JSON import/export.
     • Undo on delete, keyboard quick-launch (1-9), full a11y (focus trap, inert, ARIA).
 
@@ -213,9 +212,11 @@
       padding: 0.5rem 0;
     }
     .brand { display: inline-flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
-    .brand-emblem { width: 34px; height: 34px; display: block; flex-shrink: 0;
+    .brand-emblem { width: 44px; height: 44px; display: block; flex-shrink: 0;
+      filter: drop-shadow(0 1px 4px rgba(0,0,0,0.45));
       transition: transform 0.3s ease, filter 0.3s ease; }
-    .brand:hover .brand-emblem { transform: scale(1.05) rotate(-2deg); filter: brightness(1.08); }
+    .brand:hover .brand-emblem { transform: scale(1.06) rotate(-2deg);
+      filter: brightness(1.1) drop-shadow(0 2px 6px rgba(0,0,0,0.5)); }
     .brand-name {
       font-family: var(--font-display); font-weight: 700; font-size: 1.32rem;
       letter-spacing: 0.06em; line-height: 1;
@@ -224,9 +225,7 @@
     }
     /* Search */
     .search { position: relative; display: flex; align-items: center; width: 100%;
-      max-width: 34rem; margin: 0 auto; transition: max-width 0.28s ease; }
-    /* Grow to fill the bar while typing or focused */
-    .search:focus-within, .search.has-text { max-width: 100%; }
+      max-width: 34rem; margin: 0 auto; }
     .search-engine {
       display: inline-flex; align-items: center; gap: 0.3rem;
       height: 2.5rem; padding: 0 0.6rem 0 0.75rem;
@@ -250,10 +249,11 @@
     .search-input::placeholder { color: var(--text-dim); }
     .search:focus-within .search-input,
     .search:focus-within .search-engine {
-      border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+      border-color: color-mix(in srgb, var(--accent) 34%, var(--border));
     }
     .search:focus-within .search-input {
-      box-shadow: 0 0 0 4px var(--ring); background: var(--surface-2);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+      background: var(--surface-2);
     }
     .search-clear {
       position: absolute; right: 0.45rem; top: 50%; transform: translateY(-50%);
@@ -293,32 +293,17 @@
     /* ─────────────────────────────────────────────────────────────────────
        Main content
        ───────────────────────────────────────────────────────────────────── */
-    main { flex: 1; padding: 1.5rem 0 4rem; }
+    main { flex: 1; padding: 1rem 0 4rem; }
     .fade-in { animation: fadeUp 0.45s ease both; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
     @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
-    /* Hero */
-    .hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem;
-      margin-bottom: 1.6rem; flex-wrap: wrap; }
-    .hero-left { min-width: 0; display: flex; align-items: baseline; gap: 0.9rem 1rem; flex-wrap: wrap; }
-    .greeting { font-family: var(--font-display); font-weight: 600;
-      font-size: clamp(1.6rem, 3.2vw, 2.4rem); line-height: 1.1; color: var(--text); }
-    .greeting .accentword { color: var(--accent-text); }
-    .hero-sub { display: flex; align-items: baseline; gap: 0.75rem;
-      color: var(--text-muted); flex-wrap: wrap; }
-    .clock { font-family: var(--font-num); font-size: 1.05rem; font-weight: 500;
-      letter-spacing: 0.02em; color: var(--text); font-variant-numeric: tabular-nums; }
-    .clock .ampm { font-size: 0.7em; color: var(--text-muted); margin-left: 0.15rem; }
-    .hero-date { font-size: 0.9rem; }
-    .hero-date-btn { display: inline-flex; align-items: center; gap: 0.4rem;
-      border-radius: var(--r-pill); padding: 0.2rem 0.5rem; color: var(--text-muted);
-      border: 1px solid transparent; transition: background 0.18s, border-color 0.18s, color 0.18s; }
-    .hero-date-btn:hover { background: var(--surface-2); color: var(--text); border-color: var(--border); }
-    .hero-date-btn svg { width: 14px; height: 14px; }
-
     /* Section heads */
     .section { margin-bottom: 2rem; }
+    /* Favorites: tighter above and below */
+    .section--favs { margin-bottom: 1.2rem; }
+    .section--favs .section-head { margin-bottom: 0.4rem; }
+    .section--favs .rail { padding-top: 0.1rem; padding-bottom: 0.3rem; }
     .section-head { display: flex; align-items: center; justify-content: space-between;
       gap: 1rem; margin-bottom: 0.85rem; }
     .section-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em;
@@ -358,10 +343,8 @@
     .col-card:hover { border-color: color-mix(in srgb, var(--col-accent) 55%, var(--border));
       box-shadow: 0 14px 44px rgba(0,0,0,0.24); transform: translateY(-2px); }
     .col-head { display: flex; align-items: center; gap: 0.7rem; padding: var(--pad-card) var(--pad-card) 0.7rem; }
-    .col-badge { flex-shrink: 0; width: 40px; height: 40px; border-radius: var(--r-md);
-      display: grid; place-items: center; font-size: 1.25rem; color: var(--col-accent);
-      background: color-mix(in srgb, var(--col-accent) 16%, var(--surface-3));
-      border: 1px solid color-mix(in srgb, var(--col-accent) 30%, transparent); }
+    .col-badge { flex-shrink: 0; width: 40px; height: 40px;
+      display: grid; place-items: center; font-size: 1.5rem; color: var(--col-accent); }
     .col-open { flex: 1; min-width: 0; text-align: left; border-radius: var(--r-sm);
       display: flex; align-items: center; gap: 0.7rem; padding: 0.15rem; margin: -0.15rem;
       transition: background 0.18s; }
@@ -706,7 +689,6 @@
       .search-engine .eng-label { display: none; }
       .cal-months[data-multi="3"] { grid-template-columns: 1fr; }
       .marks { grid-template-columns: 1fr; }
-      .hero { align-items: flex-start; }
     }
     @media (max-width: 560px) {
       .collections { grid-template-columns: 1fr; }
@@ -874,10 +856,6 @@
     defaultView: 'chip',           // collection preview default
     largeIconNames: false,         // show titles under Large-view icons
     searchEngine: 'ddg',
-    showClock: true,
-    showGreeting: true,
-    clock24h: false,
-    greetingName: '',
     showWeekNumbers: true,
     weekStart: 1,                  // 0 = Sunday, 1 = Monday
     confirmBeforeOpenAll: true,
@@ -973,7 +951,6 @@
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
     return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
   }
-  function greetingWord(h) { return h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 21 ? 'Good evening' : 'Good night'; }
 
   // ══════════════════════════════════════════════════════════════════════
   // Persistence + migration
@@ -1140,7 +1117,6 @@
   function commit() { persist(); render(); }
 
   function afterRender() {
-    tickClock();
     syncSearchClear();
     requestAnimationFrame(manageFocus);
   }
@@ -1188,22 +1164,9 @@
 
   // ── Home ────────────────────────────────────────────────────────────────
   function homeHTML() {
-    const s = state.settings;
-    const now = new Date();
-    const hero = (s.showGreeting || s.showClock) ? `
-      <div class="hero">
-        <div class="hero-left">
-          ${s.showGreeting ? `<div class="greeting" data-greeting>${esc(greetingWord(now.getHours()))}${s.greetingName ? `, <span class="accentword">${esc(s.greetingName)}</span>` : ''}</div>` : ''}
-          <div class="hero-sub">
-            ${s.showClock ? `<span class="clock" data-clock>${clockHTML(now)}</span>` : ''}
-            <button class="hero-date-btn" data-act="open-calendar">${I.calendar}<span data-datefull>${esc(DAY_NAMES[now.getDay()])}, ${esc(MONTH_NAMES[now.getMonth()])} ${now.getDate()}, ${now.getFullYear()}</span></button>
-          </div>
-        </div>
-      </div>` : '';
-
     const favs = favorites();
     const favSection = favs.length === 0 ? '' : `
-      <section class="section">
+      <section class="section section--favs">
         <div class="section-head"><span class="section-title">${I.starFill}</span></div>
         <div class="rail">
           ${favs.map((b, i) => `
@@ -1224,7 +1187,7 @@
       ? `<div class="empty"><span class="empty-glyph">◇</span><p>No collections yet.</p><button class="btn btn-accent" data-act="new-collection">${I.plus} New collection</button></div>`
       : `<div class="collections">${state.collections.map((c, i) => collectionCardHTML(c, i)).join('')}</div>`;
 
-    return hero + favSection + `
+    return favSection + `
       <section class="section">
         <div class="section-head">
           <span class="section-title"></span>
@@ -1237,12 +1200,6 @@
       </section>`;
   }
 
-  function clockHTML(now) {
-    let h = now.getHours(); const m = pad2(now.getMinutes());
-    if (state.settings.clock24h) return `${pad2(h)}:${m}`;
-    const ampm = h < 12 ? 'AM' : 'PM'; h = h % 12 || 12;
-    return `${h}:${m}<span class="ampm">${ampm}</span>`;
-  }
   function linkAttrs() { return state.settings.openInNewTabs ? 'target="_blank" rel="noopener"' : 'target="_self"'; }
 
   // ── Collection card ─────────────────────────────────────────────────────
@@ -1373,11 +1330,7 @@
       </div>
 
       <div class="settings-card">
-        <h2>Home &amp; widgets</h2>
-        ${row('Greeting', 'Show a time-based greeting on the home page', sw('showGreeting'))}
-        ${row('Your name', 'Personalizes the greeting (optional)', `<input class="input" style="width:12rem" type="text" value="${esc(s.greetingName)}" placeholder="e.g. Luis" data-act="set-setting" data-key="greetingName" maxlength="24">`)}
-        ${row('Clock', 'Show a live clock on the home page', sw('showClock'))}
-        ${row('24-hour clock', 'Use 24-hour time instead of AM/PM', sw('clock24h'))}
+        <h2>Calendar</h2>
         ${row('Week starts on', 'First day of the week in the calendar', segBtns('set-opt', 'weekStart', s.weekStart, [
           { val: '1', label: 'Monday' }, { val: '0', label: 'Sunday' }]))}
         ${row('Week numbers', 'Show ISO week numbers in the calendar', sw('showWeekNumbers'))}
@@ -2119,15 +2072,6 @@
   }
   function isOverlayOpen() { return !!state.overlay || state.drawer === 'notes'; }
 
-  // Clock
-  let _lastDayKey = ymd(new Date());
-  function tickClock() {
-    const now = new Date();
-    const c = document.querySelector('[data-clock]'); if (c) c.innerHTML = clockHTML(now);
-    const dk = ymd(now);
-    if (dk !== _lastDayKey) { _lastDayKey = dk; if (state.route === 'home') renderMain(); }
-  }
-
   // ══════════════════════════════════════════════════════════════════════
   // Events
   // ══════════════════════════════════════════════════════════════════════
@@ -2219,10 +2163,6 @@
     }
     if (t.dataset.act === 'set-setting' && t.type === 'text') {
       state.settings[t.dataset.key] = t.value; persist();
-      if (t.dataset.key === 'greetingName') {
-        const g = document.querySelector('[data-greeting]');
-        if (g) g.innerHTML = esc(greetingWord(new Date().getHours())) + (t.value.trim() ? `, <span class="accentword">${esc(t.value.trim())}</span>` : '');
-      }
     }
   }
 
@@ -2370,8 +2310,6 @@
     persist(); // commit migrated/seeded data so bookmarkvault:v2 becomes canonical
     render();
     ('requestIdleCallback' in window) ? requestIdleCallback(installBranding, { timeout: 2500 }) : setTimeout(installBranding, 300);
-
-    setInterval(tickClock, 20000);
 
     // Focus the web search on load (skip touch phones to avoid a keyboard popping up).
     requestAnimationFrame(() => {
