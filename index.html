@@ -211,8 +211,9 @@
       min-height: 3.5rem;
       padding: 0.5rem 0;
     }
-    .brand { display: inline-flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
-    .brand-emblem { width: 44px; height: 44px; display: block; flex-shrink: 0;
+    .brand { display: inline-flex; align-items: center; gap: 0.6rem; flex-shrink: 0;
+      margin-left: 0.35rem; }
+    .brand-emblem { width: 50px; height: 50px; display: block; flex-shrink: 0;
       filter: drop-shadow(0 1px 4px rgba(0,0,0,0.45));
       transition: transform 0.3s ease, filter 0.3s ease; }
     .brand:hover .brand-emblem { transform: scale(1.06) rotate(-2deg);
@@ -237,6 +238,7 @@
     }
     .search-engine:hover { background: var(--surface-3); color: var(--text); }
     .search-engine svg { width: 13px; height: 13px; opacity: 0.7; }
+    .eng-ico { width: 16px; height: 16px; border-radius: 3px; flex-shrink: 0; object-fit: cover; }
     .search-input {
       flex: 1; min-width: 0; height: 2.5rem;
       padding: 0 2.6rem 0 0.9rem;
@@ -682,13 +684,36 @@
        Responsive
        ───────────────────────────────────────────────────────────────────── */
     @media (max-width: 860px) {
-      .topbar-inner { grid-template-columns: auto 1fr auto; gap: 0.5rem; }
+      .topbar-inner { grid-template-columns: auto auto 1fr; gap: 0.4rem; }
       .brand-name { display: none; }
+      .brand { margin-left: 0.5rem; }
+      .brand-emblem { width: 52px; height: 52px; }
       .iconbtn .lbl { display: none; }
-      .search { max-width: none; }
+      .top-actions { justify-self: end; }
+      /* Compact search: engine favicon + short field */
+      .search {
+        max-width: 7.25rem; width: 7.25rem; margin: 0; flex: 0 0 auto;
+      }
+      .search-engine {
+        width: 2.2rem; min-width: 2.2rem; height: 2.2rem; padding: 0;
+        justify-content: center;
+      }
       .search-engine .eng-label { display: none; }
+      .eng-ico { width: 18px; height: 18px; border-radius: 4px; }
+      .search-input {
+        height: 2.2rem; font-size: 0.78rem; padding: 0 0.45rem 0 0.4rem;
+      }
+      .search-input::placeholder { color: transparent; }
+      .search-clear { display: none; }
       .cal-months[data-multi="3"] { grid-template-columns: 1fr; }
       .marks { grid-template-columns: 1fr; }
+      /* Favorites: icon-only chips on mobile */
+      .fav {
+        width: var(--tile-h); height: var(--tile-h); padding: 0;
+        justify-content: center; gap: 0;
+      }
+      .fav-name { display: none; }
+      .fav-ico { width: 24px; height: 24px; }
     }
     @media (max-width: 560px) {
       .collections { grid-template-columns: 1fr; }
@@ -697,7 +722,7 @@
       .detail-actions .btn { flex: 1; }
       .modal-actions { flex-direction: column-reverse; }
       .modal-actions .btn { width: 100%; }
-      .fav { width: 160px; }
+      .search { max-width: 6.5rem; width: 6.5rem; }
     }
     @media (hover: none) {
       .col-card:hover, .fav:hover, .p-item:hover { transform: none; box-shadow: none; }
@@ -792,6 +817,10 @@
     { id: 'youtube',   label: 'YouTube',    short: 'YouTube',    url: 'https://www.youtube.com/results?search_query=%s' },
   ];
   const engineById = (id) => ENGINES.find(e => e.id === id) || ENGINES[0];
+  function engineIconSrc(eng) {
+    try { return faviconUrl(new URL(eng.url.replace('%s', 'q')).origin); }
+    catch { return ''; }
+  }
 
   // Deterministic muted-jewel palette for letter-avatar fallbacks.
   const AVATAR_PALETTE = ['#6b2e3a','#345240','#3d4a5c','#5a3a5e','#7a5a2a','#2e545a','#6b3a2e','#3a3a6b','#4a5230','#6b5230','#4a2e5a','#5a2e3a'];
@@ -1140,7 +1169,8 @@
 
         <form class="search" role="search" data-act="websearch">
           <button type="button" class="search-engine" data-act="cycle-engine" aria-label="Search engine: ${esc(eng.label)}. Click to change." title="Click to change search engine">
-            ${I.globe}<span class="eng-label">${esc(eng.short)}</span>
+            <img class="eng-ico" src="${esc(engineIconSrc(eng))}" alt="" width="16" height="16" data-avatar="${esc(avatarDataUrl(eng.label, eng.url))}" onerror="this.onerror=null;this.src=this.dataset.avatar;">
+            <span class="eng-label">${esc(eng.short)}</span>
           </button>
           <input type="search" name="q" class="search-input" data-search
                  placeholder="Search ${esc(eng.label)}${eng.bangs ? '  —  try !w, !g, !yt' : ''}…"
@@ -1878,8 +1908,14 @@
     persist();
     const eng = engineById(state.settings.searchEngine);
     const label = document.querySelector('.search-engine .eng-label');
+    const ico = document.querySelector('.search-engine .eng-ico');
     const input = document.querySelector('[data-search]');
     if (label) label.textContent = eng.short;
+    if (ico) {
+      ico.onerror = function () { this.onerror = null; this.src = this.dataset.avatar; };
+      ico.dataset.avatar = avatarDataUrl(eng.label, eng.url);
+      ico.src = engineIconSrc(eng);
+    }
     if (input) { input.setAttribute('placeholder', `Search ${eng.label}${eng.bangs ? '  —  try !w, !g, !yt' : ''}…`); input.focus(); }
     const btn = document.querySelector('.search-engine');
     if (btn) { btn.setAttribute('aria-label', `Search engine: ${eng.label}. Click to change.`); }
